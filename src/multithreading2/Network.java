@@ -25,8 +25,8 @@ public class Network extends Thread {
     private static Transactions outGoingPacket[];              /* Outgoing network buffer */
     private static String inBufferStatus, outBufferStatus;     /* Current status of the network buffers - normal, full, empty */
     private static String networkStatus;                       /* Network status - active, inactive */
-    private static Semaphore semaphore = new Semaphore(2);   
-    
+    private static Semaphore semaphore = new Semaphore(1);   
+    private static Semaphore semaphore1 = new Semaphore(1);
     /** 
      * Constructor of the Network class
      * 
@@ -396,7 +396,7 @@ public class Network extends Thread {
         {
 
         	 try {
-				semaphore.acquire();
+				semaphore1.acquire();
         		 outPacket.setAccountNumber(outGoingPacket[outputIndexClient].getAccountNumber());
         		 outPacket.setOperationType(outGoingPacket[outputIndexClient].getOperationType());
         		 outPacket.setTransactionAmount(outGoingPacket[outputIndexClient].getTransactionAmount());
@@ -419,7 +419,7 @@ public class Network extends Thread {
         		 {
         			 setOutBufferStatus("normal"); 
         		 }
-        		 semaphore.release();
+        		 semaphore1.release();
 
  			} catch (InterruptedException e) {
  				// TODO Auto-generated catch block
@@ -481,7 +481,7 @@ public class Network extends Thread {
        public static boolean transferIn(Transactions inPacket)
         {
     	   	try {
-				semaphore.acquire();
+				semaphore1.acquire();
     		     inPacket.setAccountNumber(inComingPacket[outputIndexServer].getAccountNumber());
     		     inPacket.setOperationType(inComingPacket[outputIndexServer].getOperationType());
     		     inPacket.setTransactionAmount(inComingPacket[outputIndexServer].getTransactionAmount());
@@ -505,9 +505,9 @@ public class Network extends Thread {
     		    	 setInBufferStatus("normal");
     		     }
     		     
-    		     semaphore.release();
+    		     semaphore1.release();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				//TODO Auto-generated catch block
 				e.printStackTrace();
 			}
              return true;

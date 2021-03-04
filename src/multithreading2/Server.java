@@ -439,9 +439,9 @@ public class Server extends Thread {
 	    	long serverStartTime, serverEndTime;
 	    	/* System.out.println("\n DEBUG : Server.run() - starting server thread " + objNetwork.getServerConnectionStatus()); */
 	    	serverStartTime = System.currentTimeMillis();
-	         processTransactions(trans);
-	         serverEndTime = System.currentTimeMillis();
-	         System.out.println("\n Terminating server thread 2- " + " Running time " + (serverEndTime - serverStartTime) + " milliseconds");
+	        processTransactions(trans);
+	        serverEndTime = System.currentTimeMillis();
+	        System.out.println("\n Terminating server thread 2- " + " Running time " + (serverEndTime - serverStartTime) + " milliseconds");
 		}
     	/* .....................................................................................................................................................................................................*/
     	Network.disconnect(Network.getServerIP());
