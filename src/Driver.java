@@ -1,4 +1,3 @@
-package multithreading2;
 
 
 /*
@@ -21,9 +20,9 @@ public class Driver {
         
     	Network objNetwork = new Network( );            /* Activate the network */
         objNetwork.start();
-        Server objServer1 = new Server("Server-Thread 1");
+        Server objServer1 = new Server("Server-Thread 1");                        /* Start the server */ 
         objServer1.start();
-        Server objServer2 = new Server("Server-Thread 2");
+        Server objServer2 = new Server("Server-Thread 2");                        /* Start the server */ 
         objServer2.start();
         Client objClient1 = new Client("sending");          /* Start the sending client thread */
         objClient1.start();

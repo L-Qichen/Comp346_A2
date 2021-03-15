@@ -1,4 +1,3 @@
-package multithreading2;
 
 import java.util.Scanner;
 import java.io.FileInputStream;
@@ -24,6 +23,7 @@ public class Client extends Thread {
     private String clientOperation;    			/* sending or receiving */
     private static boolean checkSendingStatus = false;
     private static boolean checkReceivingStatus = false;
+    
        
 	/** Constructor method of Client class
  	 * 
@@ -159,10 +159,10 @@ public class Client extends Thread {
          while (i < getNumberOfTransactions())
          {  
 	
-        	 while (Network.getInBufferStatus().equals("full"))
-        	{ 
-         	  Thread.yield(); 	/* Yield the cpu if the network input buffer is full */
-          }
+        //	 while (Network.getInBufferStatus().equals("full"))
+        //	{ 
+        // 	  Thread.yield(); 	/* Yield the cpu if the network input buffer is full */
+        //  }
                                               	
             transaction[i].setTransactionStatus("sent");   /* Set current transaction status */
            
@@ -186,11 +186,11 @@ public class Client extends Thread {
          
          while (i < getNumberOfTransactions())
          {   
-        	 while (Network.getOutBufferStatus().equals("empty")) 
-        	 { 
-        		 Thread.yield(); 	/* Yield the cpu if the network output buffer is full */
+        	// while (Network.getOutBufferStatus().equals("empty")) 
+        	// { 
+        	//	 Thread.yield(); 	/* Yield the cpu if the network output buffer is full */
         		 
-        	 }
+        	// }
                                                                             	
             Network.receive(transact);                               	/* Receive updated transaction from the network buffer */
             
@@ -218,30 +218,28 @@ public class Client extends Thread {
      * @return 
      * @param
      */
-    public void run()
-    {   
-    	Transactions transact = new Transactions();
-    	long sendClientStartTime, sendClientEndTime, receiveClientStartTime, receiveClientEndTime;
+     public void run()
+     {   
+     	Transactions transact = new Transactions();
+     	long sendClientStartTime, sendClientEndTime, receiveClientStartTime, receiveClientEndTime;
      
-        /*................................................................................................................................................................................................................*/
-    	/* Implement the code for the run method */
-    	if(clientOperation.equals("sending")) {
-    		sendClientStartTime = System.currentTimeMillis();
-    		sendTransactions();
-    		sendClientEndTime = System.currentTimeMillis();
-    		System.out.println("\n Terminating client sending thread - " + " Running time " + (sendClientEndTime - sendClientStartTime) + " milliseconds");
-    		checkSendingStatus = true;
-    	}
-    	else if(clientOperation.equals("receiving")) {
-    		receiveClientStartTime = System.currentTimeMillis();
-    		receiveTransactions(transact);
-    		receiveClientEndTime = System.currentTimeMillis();
-    		System.out.println("\n Terminating client receiving thread - " + " Running time " + (receiveClientEndTime - receiveClientStartTime) + " milliseconds");
-    		checkReceivingStatus = true;
-    	}
-    	if(checkSendingStatus && checkReceivingStatus) {
-    		Network.disconnect(Network.getClientIP());
-    	}
-                
-    }
+ 	/* Implement the code for the run method */
+     	if(clientOperation.equals("sending")) {
+     		sendClientStartTime = System.currentTimeMillis();
+     		sendTransactions();
+     		sendClientEndTime = System.currentTimeMillis();
+     		System.out.println("\n Terminating client sending thread - " + " Running time " + (sendClientEndTime - sendClientStartTime) + " milliseconds");
+     		checkSendingStatus = true;
+     	}
+     	else if(clientOperation.equals("receiving")) {
+     		receiveClientStartTime = System.currentTimeMillis();
+     		receiveTransactions(transact);
+     		receiveClientEndTime = System.currentTimeMillis();
+     		System.out.println("\n Terminating client receiving thread - " + " Running time " + (receiveClientEndTime - receiveClientStartTime) + " milliseconds");
+     		checkReceivingStatus = true;
+     	}
+     	if(checkSendingStatus && checkReceivingStatus) {
+     		Network.disconnect(Network.getClientIP());
+     	}
+     }
 }

@@ -1,4 +1,3 @@
-package multithreading2;
 
 import java.util.concurrent.*;
 
@@ -25,8 +24,7 @@ public class Network extends Thread {
     private static Transactions outGoingPacket[];              /* Outgoing network buffer */
     private static String inBufferStatus, outBufferStatus;     /* Current status of the network buffers - normal, full, empty */
     private static String networkStatus;                       /* Network status - active, inactive */
-    private static Semaphore semaphore = new Semaphore(1);   
-    private static Semaphore semaphore1 = new Semaphore(1);
+       
     /** 
      * Constructor of the Network class
      * 
@@ -355,8 +353,7 @@ public class Network extends Thread {
      */
         public static boolean send(Transactions inPacket)
         {
-        	try {
-				semaphore.acquire();
+        	
         		  inComingPacket[inputIndexClient].setAccountNumber(inPacket.getAccountNumber());
         		  inComingPacket[inputIndexClient].setOperationType(inPacket.getOperationType());
         		  inComingPacket[inputIndexClient].setTransactionAmount(inPacket.getTransactionAmount());
@@ -379,11 +376,7 @@ public class Network extends Thread {
         		  {
         			  setInBufferStatus("normal");
         		  }
-        		  semaphore.release();
-        	} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+            
             return true;
         }   
          
@@ -395,8 +388,6 @@ public class Network extends Thread {
          public static boolean receive(Transactions outPacket)
         {
 
-        	 try {
-				semaphore1.acquire();
         		 outPacket.setAccountNumber(outGoingPacket[outputIndexClient].getAccountNumber());
         		 outPacket.setOperationType(outGoingPacket[outputIndexClient].getOperationType());
         		 outPacket.setTransactionAmount(outGoingPacket[outputIndexClient].getTransactionAmount());
@@ -419,12 +410,7 @@ public class Network extends Thread {
         		 {
         			 setOutBufferStatus("normal"); 
         		 }
-        		 semaphore1.release();
-
- 			} catch (InterruptedException e) {
- 				// TODO Auto-generated catch block
- 				e.printStackTrace();
- 			}
+        	            
              return true;
         }   
          
@@ -438,8 +424,7 @@ public class Network extends Thread {
      */
          public static boolean transferOut(Transactions outPacket)
         {
-        	 try {
-				semaphore.acquire();
+	   	
         		outGoingPacket[inputIndexServer].setAccountNumber(outPacket.getAccountNumber());
         		outGoingPacket[inputIndexServer].setOperationType(outPacket.getOperationType());
         		outGoingPacket[inputIndexServer].setTransactionAmount(outPacket.getTransactionAmount());
@@ -462,12 +447,6 @@ public class Network extends Thread {
         		{
         			setOutBufferStatus("normal");
         		}
-        		semaphore.release();
-
- 			} catch (InterruptedException e) {
- 				// TODO Auto-generated catch block
- 				e.printStackTrace();
- 			}
         	            
              return true;
         }   
@@ -480,8 +459,7 @@ public class Network extends Thread {
      */
        public static boolean transferIn(Transactions inPacket)
         {
-    	   	try {
-				semaphore1.acquire();
+	
     		     inPacket.setAccountNumber(inComingPacket[outputIndexServer].getAccountNumber());
     		     inPacket.setOperationType(inComingPacket[outputIndexServer].getOperationType());
     		     inPacket.setTransactionAmount(inComingPacket[outputIndexServer].getTransactionAmount());
@@ -504,12 +482,7 @@ public class Network extends Thread {
     		     {
     		    	 setInBufferStatus("normal");
     		     }
-    		     
-    		     semaphore1.release();
-			} catch (InterruptedException e) {
-				//TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+            
              return true;
         }   
          
@@ -581,18 +554,17 @@ public class Network extends Thread {
      * @return 
      * @param
      */
-    public void run()
-    {	
-    	/* System.out.println("\n DEBUG : Network.run() - starting network thread"); */
-    	
-    	while (true)
-    	{
-    		/*................................................................................................................................................................*/
-    		Thread.yield();
-    		if(clientConnectionStatus.equals("disconnected") && serverConnectionStatus.equals("disconnected")) {
-    			System.out.println("\n Terminating network thread - Client disconnected Server disconnected");
-    			System.exit(0);
-    		}
-    	}    
-    }
+	    public void run()
+	    {	
+	    	System.out.println("\n DEBUG : Network.run() - starting network thread");
+	    	
+	    	while (true)
+	    	{
+			/* Implement the code for the run method */
+	    		Thread.yield();
+	    		if(clientConnectionStatus.equals("disconnected") && serverConnectionStatus.equals("disconnected")) {
+	    			System.exit(0);
+	    		}
+	    	}    
+	    }
 }
