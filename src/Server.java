@@ -1,3 +1,4 @@
+package multithreading2;
 
 import java.util.Scanner;
 import java.io.FileInputStream;
@@ -271,10 +272,10 @@ public class Server extends Thread {
          /* Process the accounts until the client disconnects */
          while ((!Network.getClientConnectionStatus().equals("disconnected")))
          {
-        	// while ( (Network.getInBufferStatus().equals("empty") && !Network.getClientConnectionStatus().equals("disconnected")) ) 
-        	// { 
-        	//	 Thread.yield(); 	/* Yield the cpu if the network input buffer is empty */
-        	// }
+        	 while ( (Network.getInBufferStatus().equals("empty") && !Network.getClientConnectionStatus().equals("disconnected")) ) 
+        	 { 
+        		 Thread.yield(); 	/* Yield the cpu if the network input buffer is empty */
+        	 }
         	 
         	 if (!Network.getInBufferStatus().equals("empty"))
         	 { 
@@ -314,10 +315,10 @@ public class Server extends Thread {
 					} 
 
             	
-        	//	 while (Network.getOutBufferStatus().equals("full")) 
-        	//	 { 
-        	//		 Thread.yield();		/* Yield the cpu if the network output buffer is full */
-        	//	 }
+        		 while (Network.getOutBufferStatus().equals("full")) 
+        		 { 
+        			 Thread.yield();		/* Yield the cpu if the network output buffer is full */
+        		 }
         		
         		 /* System.out.println("\n DEBUG : Server.processTransactions() - transferring out account " + trans.getAccountNumber()); */
         		 
@@ -339,25 +340,28 @@ public class Server extends Thread {
      */
    
      public double deposit(int i, double amount)
-     {  double curBalance;      /* Current account balance */
-       
-     		curBalance = account[i].getBalance( );          /* Get current account balance */
-        
-     		/* NEW : A server thread is blocked before updating the 10th , 20th, ... 70th account balance in order to simulate an inconsistency situation */
-     		if (((i + 1) % 10 ) == 0)
-     		{
-     			try {
-     					Thread.sleep(100);
-     				}
-     				catch (InterruptedException e) {
-        	
-     				} 
-     		} 
-        
-     		System.out.println("\n DEBUG : Server.deposit - " + "i " + i + " Current balance " + curBalance + " Amount " + amount + " " + getServerThreadId());
-        
-     		account[i].setBalance(curBalance + amount);     /* Deposit amount in the account */
-     		return account[i].getBalance ();                /* Return updated account balance */
+     {  
+    	 synchronized(Server.class) {
+	    	 double curBalance;      /* Current account balance */
+	       
+	     		curBalance = account[i].getBalance( );          /* Get current account balance */
+	        
+	     		/* NEW : A server thread is blocked before updating the 10th , 20th, ... 70th account balance in order to simulate an inconsistency situation */
+	     		if (((i + 1) % 10 ) == 0)
+	     		{
+	     			try {
+	     					Thread.sleep(100);
+	     				}
+	     				catch (InterruptedException e) {
+	        	
+	     				} 
+	     		} 
+	        
+	     		System.out.println("\n DEBUG : Server.deposit - " + "i " + i + " Current balance " + curBalance + " Amount " + amount + " " + getServerThreadId());
+	        
+	     		account[i].setBalance(curBalance + amount);     /* Deposit amount in the account */
+	     		return account[i].getBalance ();                /* Return updated account balance */
+    	 }
      }
          
     /**
@@ -368,14 +372,17 @@ public class Server extends Thread {
      */
  
      public double withdraw(int i, double amount)
-     {  double curBalance;      /* Current account balance */
-        
-	curBalance = account[i].getBalance( );          /* Get current account balance */
-          
-        System.out.println("\n DEBUG : Server.withdraw - " + "i " + i + " Current balance " + curBalance + " Amount " + amount + " " + getServerThreadId());
-        
-        account[i].setBalance(curBalance - amount);     /* Withdraw amount in the account */
-        return account[i].getBalance ();                /* Return updated account balance */
+     {  
+    	 synchronized(Server.class) {
+	    	 double curBalance;      /* Current account balance */
+	        
+		curBalance = account[i].getBalance( );          /* Get current account balance */
+	          
+	        System.out.println("\n DEBUG : Server.withdraw - " + "i " + i + " Current balance " + curBalance + " Amount " + amount + " " + getServerThreadId());
+	        
+	        account[i].setBalance(curBalance - amount);     /* Withdraw amount in the account */
+	        return account[i].getBalance ();                /* Return updated account balance */
+    	 }
      	
      }
 
@@ -387,13 +394,16 @@ public class Server extends Thread {
      */
  
      public double query(int i)
-     {  double curBalance;      /* Current account balance */
-        
-	curBalance = account[i].getBalance( );          /* Get current account balance */
-        
-        System.out.println("\n DEBUG : Server.query - " + "i " + i + " Current balance " + curBalance + " " + getServerThreadId()); 
-        
-        return curBalance;                              /* Return current account balance */
+     {  
+    	 synchronized(Server.class) {
+	    	 double curBalance;      /* Current account balance */
+	        
+		curBalance = account[i].getBalance( );          /* Get current account balance */
+	        
+	        System.out.println("\n DEBUG : Server.query - " + "i " + i + " Current balance " + curBalance + " " + getServerThreadId()); 
+	        
+	        return curBalance;                              /* Return current account balance */
+    	 }
      }
          
      /**
@@ -413,30 +423,30 @@ public class Server extends Thread {
      * @param
      */
       
-     public void run()
-     {   
-     	if(serverThreadId.equals("Server-Thread 1")) {
- 	    	 Transactions trans = new Transactions();
- 	    	 long serverStartTime, serverEndTime;
- 	    	 /* System.out.println("\n DEBUG : Server.run() - starting server thread " + getServerThreadId() + " " + Network.getServerConnectionStatus()); */
- 	    	 serverStartTime = System.currentTimeMillis();
- 	         processTransactions(trans);
- 	         serverEndTime = System.currentTimeMillis();
- 	         System.out.println("\n Terminating server thread 1- " + " Running time " + (serverEndTime - serverStartTime) + " milliseconds");
- 		}
-     	else if(serverThreadId.equals("Server-Thread 2")) {
- 	    	Transactions trans = new Transactions();
- 	    	long serverStartTime, serverEndTime;
- 	    	/* System.out.println("\n DEBUG : Server.run() - starting server thread " + objNetwork.getServerConnectionStatus()); */
- 	    	serverStartTime = System.currentTimeMillis();
- 	        processTransactions(trans);
- 	        serverEndTime = System.currentTimeMillis();
- 	        System.out.println("\n Terminating server thread 2- " + " Running time " + (serverEndTime - serverStartTime) + " milliseconds");
- 		}
-     	/* .....................................................................................................................................................................................................*/
-     	Network.disconnect(Network.getServerIP());
- 	
-     }
+    public void run()
+    {   
+    	if(serverThreadId.equals("Server-Thread-1")) {
+	    	 Transactions trans = new Transactions();
+	    	 long serverStartTime, serverEndTime;
+	    	 /* System.out.println("\n DEBUG : Server.run() - starting server thread " + getServerThreadId() + " " + Network.getServerConnectionStatus()); */
+	    	 serverStartTime = System.currentTimeMillis();
+	         processTransactions(trans);
+	         serverEndTime = System.currentTimeMillis();
+	         System.out.println("\n Terminating server thread 1- " + " Running time " + (serverEndTime - serverStartTime) + " milliseconds");
+		}
+    	else if(serverThreadId.equals("Server-Thread-2")) {
+	    	Transactions trans = new Transactions();
+	    	long serverStartTime, serverEndTime;
+	    	/* System.out.println("\n DEBUG : Server.run() - starting server thread " + objNetwork.getServerConnectionStatus()); */
+	    	serverStartTime = System.currentTimeMillis();
+	        processTransactions(trans);
+	        serverEndTime = System.currentTimeMillis();
+	        System.out.println("\n Terminating server thread 2- " + " Running time " + (serverEndTime - serverStartTime) + " milliseconds");
+		}
+    	/* .....................................................................................................................................................................................................*/
+    	Network.disconnect(Network.getServerIP());
+	
+    }
 }
 
 
